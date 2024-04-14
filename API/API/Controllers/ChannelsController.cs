@@ -2,6 +2,7 @@
 using Application.ViewModels;
 using Domain;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Persistence;
 using System;
@@ -11,17 +12,8 @@ using System.Threading.Tasks;
 
 namespace API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ChannelsController : ControllerBase
+    public class ChannelsController : BaseController
     {
-        private IMediator _mediator;
-
-        public ChannelsController(IMediator mediator) 
-        {
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-        }
-
         [HttpGet("{id}")]
         public async Task<ActionResult<Channel>> Get(Guid id)
         {

@@ -36,7 +36,7 @@ namespace Application.Channels
             {
                 var channel = await _dataContext.Channels.FirstOrDefaultAsync(c => c.Id == request.Id);
                 if (channel == null)
-                    throw new ResponseException(HttpStatusCode.NotFound, new { channel = "Not found"});
+                    throw new ExceptionResponse(HttpStatusCode.NotFound, new { channel = "Not found"});
                 return channel;
             }
         }
