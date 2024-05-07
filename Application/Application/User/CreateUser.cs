@@ -14,7 +14,7 @@ namespace Application.User
 {
     public class CreateUser
     {
-        public class Command : IRequest<UserResponseVM>
+        public class Command : IRequest<UserVM>
         {
             public UserCreateVM User { get; set; }
 
@@ -39,10 +39,11 @@ namespace Application.User
                     .WithMessage("Email already exist");
                 RuleFor(x => x.Password).NotEmpty();
                 RuleFor(x => x.Password).Password();
+                RuleFor(x => x.Avatar).NotEmpty();
             }
         }
 
-        public class Handler : IRequestHandler<Command, UserResponseVM>
+        public class Handler : IRequestHandler<Command, UserVM>
         {
             private readonly UserManager<AppUser> _userManager;
             private readonly IJWTGenerator _JWTGenerator;
@@ -53,24 +54,26 @@ namespace Application.User
                 _JWTGenerator = JWTGenerator;
             }
 
-            public async Task<UserResponseVM> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<UserVM> Handle(Command request, CancellationToken cancellationToken)
             {
                 var user = new AppUser()
                 {
                     Email = request.User.Email,
-                    UserName = request.User.UserName
+                    UserName = request.User.UserName,
+                    Avatar = request.User.Avatar
                 };
 
                 var result = await _userManager.CreateAsync(user, request.User.Password);
 
                 if (!result.Succeeded)
-                    throw new ExceptionResponse(System.Net.HttpStatusCode.InternalServerError, new { message = "Error with user creation" });
+                    throw new ExceptionResponse(System.Net.HttpStatusCode.InternalServerError, new { message = "Error with user creation", result.Errors });
 
-                var response = new UserResponseVM
+                var response = new UserVM
                 {
                     UserName = user.UserName,
                     Email = user.Email,
-                    Token = _JWTGenerator.CreateToken(user)
+                    Token = _JWTGenerator.CreateToken(user),
+                    Avatar = user.Avatar
                 };
 
                 return response;

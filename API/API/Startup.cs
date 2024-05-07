@@ -1,7 +1,7 @@
 using API.Middleware;
+using Application;
 using Application.Channels;
 using Application.Interfaces;
-using Application.User;
 using Domain;
 using FluentValidation.AspNetCore;
 using Infrastructurs.Security;
@@ -81,6 +81,8 @@ namespace API
                         ValidateIssuer = false
                     };
                 });
+
+            services.AddApplication();
 
             services.AddScoped<IJWTGenerator, JWTGenerator>();
             services.AddScoped<IUserAccess, UserAccess>();

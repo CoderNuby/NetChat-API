@@ -28,7 +28,7 @@ namespace API
 
                     context.Database.Migrate();
 
-                    Seed.SeedData(userManager).Wait();
+                    //Seed.SeedDataUser(userManager).Wait();
                 }
                 catch (Exception e)
                 {

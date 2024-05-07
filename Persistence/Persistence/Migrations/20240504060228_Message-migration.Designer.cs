@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence;
 
 namespace Persistence.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240504060228_Message-migration")]
+    partial class Messagemigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,6 +103,29 @@ namespace Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Channels");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("dbe47a37-1fea-4946-8e97-486761d43036"),
+                            ChannelType = 0,
+                            Description = "This channel is dedicated to DotNet Core",
+                            Name = "DotNetCore"
+                        },
+                        new
+                        {
+                            Id = new Guid("c9122c0b-8a19-4c13-8d18-e0da3cebd945"),
+                            ChannelType = 0,
+                            Description = "This channel is dedicated to Angular",
+                            Name = "Angular"
+                        },
+                        new
+                        {
+                            Id = new Guid("a62c3e1a-bb44-4ef5-9ca1-9e071219ae26"),
+                            ChannelType = 0,
+                            Description = "This channel is dedicated to ReactJs",
+                            Name = "ReactJs"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Message", b =>

@@ -1,4 +1,5 @@
 ﻿using Domain;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,30 +14,12 @@ namespace Persistence
         }
 
         public DbSet<Channel> Channels { get; set; }
-
+        public DbSet<Message> Messages { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Channel>().HasData(
-                new Channel
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "DotNetCore",
-                    Description = "This channel is dedicated to DotNet Core"
-                },
-                new Channel
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Angular",
-                    Description = "This channel is dedicated to Angular"
-                },
-                new Channel
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "ReactJs",
-                    Description = "This channel is dedicated to ReactJs"
-                }
-            );
+            modelBuilder.Entity<Message>().HasOne(x => x.Sender)
+                .WithMany(x => x.Messages).HasForeignKey(x => x.SenderId);
         }
     }
 }

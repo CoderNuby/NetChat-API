@@ -13,7 +13,7 @@ namespace Application.User
 {
     public class Login
     {
-        public class Query : IRequest<UserResponseVM>
+        public class Query : IRequest<UserVM>
         {
             public UserLoginVM User;
 
@@ -32,7 +32,7 @@ namespace Application.User
             }
         }
 
-        public class Handler : IRequestHandler<Query, UserResponseVM>
+        public class Handler : IRequestHandler<Query, UserVM>
         {
             private readonly UserManager<AppUser> _userManager;
             private readonly SignInManager<AppUser> _signInManager;
@@ -45,7 +45,7 @@ namespace Application.User
                 _jwtGenerator = jwtGenerator;
             }
 
-            public async Task<UserResponseVM> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<UserVM> Handle(Query request, CancellationToken cancellationToken)
             {
                 var userDB = await _userManager.FindByEmailAsync(request.User.Email);
 
@@ -58,7 +58,7 @@ namespace Application.User
 
                 if (auth.Succeeded)
                 {
-                    var user = new UserResponseVM() 
+                    var user = new UserVM() 
                     {
                         Token = _jwtGenerator.CreateToken(userDB),
                         UserName = userDB.UserName,

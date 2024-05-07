@@ -14,12 +14,12 @@ namespace Application.User
 {
     public class GetCurrentUser
     {
-        public class Query : IRequest<UserResponseVM>
+        public class Query : IRequest<UserVM>
         {
 
         }
 
-        public class Handler : IRequestHandler<Query, UserResponseVM>
+        public class Handler : IRequestHandler<Query, UserVM>
         {
             private readonly IUserAccess _userAccess;
             private readonly UserManager<AppUser> _userManager;
@@ -32,11 +32,11 @@ namespace Application.User
                 _JWTGenerator = jWTGenerator;
             }
 
-            public async Task<UserResponseVM> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<UserVM> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = await _userManager.FindByNameAsync(_userAccess.GetCurrentUserName());
 
-                var response = new UserResponseVM
+                var response = new UserVM
                 {
                     UserName = user.UserName,
                     Token = _JWTGenerator.CreateToken(user)

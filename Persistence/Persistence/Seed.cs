@@ -1,5 +1,6 @@
 ﻿using Domain;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace Persistence
 {
     public class Seed
     {
-        public static async Task SeedData(UserManager<AppUser> userManager)
+        public static async Task SeedDataUser(UserManager<AppUser> userManager)
         {
             if(userManager.Users.Count() == 0)
             {

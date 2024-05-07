@@ -1,4 +1,5 @@
 ﻿using Application.ViewModels;
+using AutoMapper;
 using Domain;
 using FluentValidation;
 using MediatR;
@@ -14,7 +15,7 @@ namespace Application.Channels
 {
     public class CreateChannel
     {
-        public class Command : IRequest
+        public class Command : IRequest<ChannelVM>
         {
             public ChannelCreateVM Channel { get; set; }
             public Command(ChannelCreateVM channel) 
@@ -32,26 +33,33 @@ namespace Application.Channels
             }
         }
 
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command, ChannelVM>
         {
             private readonly DataContext _context;
-            public Handler(DataContext context)
+            private readonly IMapper _mapper;
+
+            public Handler(DataContext context, IMapper mapper)
             {
                 _context = context ?? throw new ArgumentNullException(nameof(context));
+                _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             }
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<ChannelVM> Handle(Command request, CancellationToken cancellationToken)
             {
                 var channel = new Channel()
                 {
                     Id = Guid.NewGuid(),
                     Name = request.Channel.Name,
-                    Description = request.Channel.Description
+                    Description = request.Channel.Description,
+                    ChannelType = ChannelTypeEnum.Channel
                 };
                 _context.Channels.Add(channel);
                 var success = await _context.SaveChangesAsync() > 0;
-
                 if (success)
-                    return Unit.Value;
+                {
+                    var channelDB = await _context.Channels.FindAsync(channel.Id);
+                    var response = _mapper.Map<ChannelVM>(channelDB);
+                    return response;
+                }
 
                 throw new Exception("An error was occurred");
             }
