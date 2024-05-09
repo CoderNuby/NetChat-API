@@ -11,7 +11,7 @@ namespace Application.ViewModels
     {
         public Guid Id { get; set; }
         public string Content { get; set; }
-        public DateTime CreateAt { get; set; }
+        public DateTime CreatedAt { get; set; }
         public UserVM Sender { get; set; }
         public MessageTypeEnum MessageType { get; set; }
     }

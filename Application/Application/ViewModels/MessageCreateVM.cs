@@ -1,4 +1,5 @@
 ﻿using Domain;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,7 @@ namespace Application.ViewModels
         public string Content { get; set; }
         public Guid ChannelId { get; set; }
         public MessageTypeEnum MessageType { get; set; } = MessageTypeEnum.Text;
+
+        public IFormFile File { get; set; }
     }
 }

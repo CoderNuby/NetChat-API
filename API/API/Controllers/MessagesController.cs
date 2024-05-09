@@ -12,5 +12,11 @@ namespace API.Controllers
         {
             return _mediator.Send(new CreateMessage.Command(message));
         }
+
+        [HttpPost("upload")]
+        public Task<MessageVM> MediaUpload([FromForm] MessageCreateVM message)
+        {
+            return _mediator.Send(new CreateMessage.Command(message));
+        }
     }
 }

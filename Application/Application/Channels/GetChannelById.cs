@@ -1,7 +1,6 @@
 ﻿using Application.Errors;
 using Application.ViewModels;
 using AutoMapper;
-using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -42,6 +41,8 @@ namespace Application.Channels
                     .ThenInclude(x => x.Sender).FirstOrDefaultAsync(x => x.Id == request.Id);
                 if (channel == null)
                     throw new ExceptionResponse(HttpStatusCode.NotFound, new { channel = "Not found"});
+
+                channel.Messages = channel.Messages.OrderBy(x => x.CreatedAt).ToList();
                 
                 var response = _mapper.Map<ChannelVM>(channel);
                 

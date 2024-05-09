@@ -32,11 +32,16 @@ namespace Application.Messages
             public DataContext _context;
             public IUserAccess _userAccess;
             public IMapper _mapper;
-            public Handler(DataContext context, IUserAccess userAccesor, IMapper mapper)
+            public IMediaUpload _mediaUpload;
+            public Handler(DataContext context,
+                IUserAccess userAccesor,
+                IMapper mapper,
+                IMediaUpload mediaUpload)
             {
                 _context = context;
                 _userAccess = userAccesor;
                 _mapper = mapper;
+                _mediaUpload = mediaUpload;
             }
 
             public async Task<MessageVM> Handle(Command request, CancellationToken cancellationToken)
@@ -51,7 +56,7 @@ namespace Application.Messages
                 var message = new Message
                 {
                     Id = Guid.NewGuid(),
-                    Content = request.Message.Content,
+                    Content = request.Message.MessageType == MessageTypeEnum.Text ? request.Message.Content : _mediaUpload.UploadMedia(request.Message.File).Url,
                     Channel = channel,
                     Sender = user,
                     CreatedAt = DateTime.Now,
