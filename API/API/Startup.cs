@@ -62,7 +62,10 @@ namespace API
             {
                 opt.AddPolicy("CorsPolicy", policy =>
                 {
-                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+                    policy.AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials()
+                            .WithOrigins("http://localhost:3000");
                 });
             });
             services.AddMediatR(typeof(GetChannels.Handler).Assembly);
@@ -92,7 +95,7 @@ namespace API
 
                             var path = context.HttpContext.Request.Path;
                             
-                            if (string.IsNullOrEmpty(accessToken) 
+                            if (!string.IsNullOrEmpty(accessToken)
                                 && path.StartsWithSegments("/chat"))
                             {
                                 context.Token = accessToken;
