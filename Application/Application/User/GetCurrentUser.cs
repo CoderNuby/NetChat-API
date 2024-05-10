@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.ViewModels;
+using AutoMapper;
 using Domain;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -24,23 +25,23 @@ namespace Application.User
             private readonly IUserAccess _userAccess;
             private readonly UserManager<AppUser> _userManager;
             private readonly IJWTGenerator _JWTGenerator;
+            private readonly IMapper _mapper;
 
-            public Handler(IUserAccess userAccess, UserManager<AppUser> userManager, IJWTGenerator jWTGenerator)
+            public Handler(IUserAccess userAccess, UserManager<AppUser> userManager, IJWTGenerator jWTGenerator, IMapper mapper)
             {
                 _userAccess = userAccess;
                 _userManager = userManager;
                 _JWTGenerator = jWTGenerator;
+                _mapper = mapper;
             }
 
             public async Task<UserVM> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = await _userManager.FindByNameAsync(_userAccess.GetCurrentUserName());
 
-                var response = new UserVM
-                {
-                    UserName = user.UserName,
-                    Token = _JWTGenerator.CreateToken(user)
-                };
+                var response = _mapper.Map<UserVM>(user);
+
+                response.Token = _JWTGenerator.CreateToken(user);
 
                 return response;
             }

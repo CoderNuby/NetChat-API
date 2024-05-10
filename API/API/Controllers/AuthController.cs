@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Persistence;
 using System.Linq;
 using System.Collections.Generic;
+using MediatR;
 
 namespace API.Controllers
 {
@@ -32,6 +33,12 @@ namespace API.Controllers
         public async Task<ActionResult<UserVM>> CurrentUser()
         {
             return await _mediator.Send(new GetCurrentUser.Query());
+        }
+
+        [HttpGet("logout/{userId}")]
+        public async Task<ActionResult<Unit>> Logout(string userId)
+        {
+            return await _mediator.Send(new Logout.Query(userId));
         }
     }
 }

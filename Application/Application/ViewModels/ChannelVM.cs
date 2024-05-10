@@ -14,5 +14,6 @@ namespace Application.ViewModels
         public string Description { get; set; }
         public ICollection<MessageVM> Messages { get; set; }
         public ChannelTypeEnum ChannelType { get; set; }
+        public string PrivateChannelId { get; set; }
     }
 }

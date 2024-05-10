@@ -31,5 +31,11 @@ namespace API.Controllers
         {
             return await _mediator.Send(new CreateChannel.Command(channel));
         }
+
+        [HttpPost("private/{channelId}")]
+        public async Task<ActionResult<ChannelVM>> CreatePrivateDetails(string channelId)
+        {
+            return await _mediator.Send(new CreatePrivateChannelDetails.Command(channelId));
+        }
     }
 }

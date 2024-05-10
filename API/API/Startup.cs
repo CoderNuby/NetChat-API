@@ -1,4 +1,5 @@
 using API.Middleware;
+using API.SignalR;
 using Application;
 using Application.Channels;
 using Application.Interfaces;
@@ -21,6 +22,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Persistence;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace API
 {
@@ -81,6 +83,24 @@ namespace API
                         ValidateAudience = false,
                         ValidateIssuer = false
                     };
+
+                    opt.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+
+                            var path = context.HttpContext.Request.Path;
+                            
+                            if (string.IsNullOrEmpty(accessToken) 
+                                && path.StartsWithSegments("/chat"))
+                            {
+                                context.Token = accessToken;
+                            }
+
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
 
             services.AddApplication();
@@ -90,6 +110,8 @@ namespace API
 
             services.Configure<CloudinarySettings>(Configuration.GetSection("Cloudinary"));
             services.AddScoped<IMediaUpload, MediaUpload>();
+
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -115,6 +137,7 @@ namespace API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/chat");
             });
         }
     }

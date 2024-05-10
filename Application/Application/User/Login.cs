@@ -5,6 +5,7 @@ using Domain;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Persistence;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,12 +38,14 @@ namespace Application.User
             private readonly UserManager<AppUser> _userManager;
             private readonly SignInManager<AppUser> _signInManager;
             private readonly IJWTGenerator _jwtGenerator;
+            private readonly DataContext _context;
 
-            public Handler(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IJWTGenerator jwtGenerator)
+            public Handler(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IJWTGenerator jwtGenerator, DataContext context)
             {
                 _userManager = userManager;
                 _signInManager = signInManager;
                 _jwtGenerator = jwtGenerator;
+                _context = context;
             }
 
             public async Task<UserVM> Handle(Query request, CancellationToken cancellationToken)
@@ -58,11 +61,16 @@ namespace Application.User
 
                 if (auth.Succeeded)
                 {
+                    userDB.IsOnline = true;
+                    await _context.SaveChangesAsync();
                     var user = new UserVM() 
                     {
+                        Id = userDB.Id,
                         Token = _jwtGenerator.CreateToken(userDB),
                         UserName = userDB.UserName,
-                        Email = userDB.Email
+                        Email = userDB.Email,
+                        Avatar = userDB.Avatar,
+                        IsOnline = userDB.IsOnline
                     };
 
                     return user;

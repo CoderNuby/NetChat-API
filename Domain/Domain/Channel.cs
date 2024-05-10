@@ -13,5 +13,6 @@ namespace Domain
         public string Description { get; set; }
         public ICollection<Message> Messages { get; set; }
         public ChannelTypeEnum ChannelType { get; set; }
+        public string PrivateChannelId { get; set; }
     }
 }

@@ -13,5 +13,6 @@ namespace Domain
         public string Avatar {  get; set; }
         [JsonIgnore]
         public ICollection<Message> Messages { get; set; }
+        public bool IsOnline { get; set; }
     }
 }
