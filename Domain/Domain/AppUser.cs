@@ -14,5 +14,7 @@ namespace Domain
         [JsonIgnore]
         public ICollection<Message> Messages { get; set; }
         public bool IsOnline { get; set; }
+        [JsonIgnore]
+        public ICollection<TypingNotification> TypingNotifications { get; set; }
     }
 }

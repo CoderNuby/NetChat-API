@@ -15,6 +15,7 @@ namespace Application.Profiles
         {
             CreateMap<Channel, ChannelVM>().ReverseMap();
             CreateMap<Message, MessageVM>().ReverseMap();
+            CreateMap<TypingNotification, TypingNotificationVM>().ReverseMap();
             CreateMap<AppUser, UserVM>()
                 .ForMember(dest => dest.Token, opt => opt.Ignore())
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))

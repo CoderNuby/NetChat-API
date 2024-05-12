@@ -9,8 +9,8 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240509045024_AddPrivateChannel")]
-    partial class AddPrivateChannel
+    [Migration("20240512071915_TypingRelation")]
+    partial class TypingRelation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -139,6 +139,29 @@ namespace Persistence.Migrations
                     b.HasIndex("SenderId");
 
                     b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("Domain.TypingNotification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ChannelId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChannelId")
+                        .IsUnique();
+
+                    b.HasIndex("SenderId")
+                        .IsUnique();
+
+                    b.ToTable("TypingNotifications");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -280,6 +303,19 @@ namespace Persistence.Migrations
                     b.HasOne("Domain.AppUser", "Sender")
                         .WithMany("Messages")
                         .HasForeignKey("SenderId");
+                });
+
+            modelBuilder.Entity("Domain.TypingNotification", b =>
+                {
+                    b.HasOne("Domain.Channel", "Channel")
+                        .WithOne("TypingNotification")
+                        .HasForeignKey("Domain.TypingNotification", "ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.AppUser", "Sender")
+                        .WithOne("TypingNotification")
+                        .HasForeignKey("Domain.TypingNotification", "SenderId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

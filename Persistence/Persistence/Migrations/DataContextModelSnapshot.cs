@@ -139,6 +139,27 @@ namespace Persistence.Migrations
                     b.ToTable("Messages");
                 });
 
+            modelBuilder.Entity("Domain.TypingNotification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ChannelId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChannelId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("TypingNotifications");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -277,6 +298,19 @@ namespace Persistence.Migrations
 
                     b.HasOne("Domain.AppUser", "Sender")
                         .WithMany("Messages")
+                        .HasForeignKey("SenderId");
+                });
+
+            modelBuilder.Entity("Domain.TypingNotification", b =>
+                {
+                    b.HasOne("Domain.Channel", "Channel")
+                        .WithMany("TypingNotifications")
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.AppUser", "Sender")
+                        .WithMany("TypingNotifications")
                         .HasForeignKey("SenderId");
                 });
 

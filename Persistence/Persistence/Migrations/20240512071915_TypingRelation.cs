@@ -3,25 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Persistence.Migrations
 {
-    public partial class AddedIdentity : Migration
+    public partial class TypingRelation : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData(
-                table: "Channels",
-                keyColumn: "Id",
-                keyValue: new Guid("550afbdf-08b6-4560-b2f0-4f56bffb9d65"));
-
-            migrationBuilder.DeleteData(
-                table: "Channels",
-                keyColumn: "Id",
-                keyValue: new Guid("71e9cc37-a261-4493-91b3-4f6d1e3cc020"));
-
-            migrationBuilder.DeleteData(
-                table: "Channels",
-                keyColumn: "Id",
-                keyValue: new Guid("a389a51d-d2a7-400e-97ac-e5b299aeba92"));
-
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -54,11 +39,28 @@ namespace Persistence.Migrations
                     TwoFactorEnabled = table.Column<bool>(nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
-                    AccessFailedCount = table.Column<int>(nullable: false)
+                    AccessFailedCount = table.Column<int>(nullable: false),
+                    Avatar = table.Column<string>(nullable: true),
+                    IsOnline = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Channels",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
+                    ChannelType = table.Column<int>(nullable: false),
+                    PrivateChannelId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Channels", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -167,20 +169,58 @@ namespace Persistence.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "Channels",
-                columns: new[] { "Id", "Description", "Name" },
-                values: new object[] { new Guid("8cdd4a38-6b7a-4acf-b9e0-a5e1a66550ab"), "This channel is dedicated to DotNet Core", "DotNetCore" });
+            migrationBuilder.CreateTable(
+                name: "Messages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    Content = table.Column<string>(nullable: true),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    SenderId = table.Column<string>(nullable: true),
+                    ChannelId = table.Column<Guid>(nullable: false),
+                    MessageType = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Messages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Messages_Channels_ChannelId",
+                        column: x => x.ChannelId,
+                        principalTable: "Channels",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Messages_AspNetUsers_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
 
-            migrationBuilder.InsertData(
-                table: "Channels",
-                columns: new[] { "Id", "Description", "Name" },
-                values: new object[] { new Guid("cfe36434-4780-4bcb-8c65-cc4207b4240b"), "This channel is dedicated to Angular", "Angular" });
-
-            migrationBuilder.InsertData(
-                table: "Channels",
-                columns: new[] { "Id", "Description", "Name" },
-                values: new object[] { new Guid("4c2b9717-6291-437c-a766-80449d844266"), "This channel is dedicated to ReactJs", "ReactJs" });
+            migrationBuilder.CreateTable(
+                name: "TypingNotifications",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    ChannelId = table.Column<Guid>(nullable: false),
+                    SenderId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TypingNotifications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TypingNotifications_Channels_ChannelId",
+                        column: x => x.ChannelId,
+                        principalTable: "Channels",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TypingNotifications_AspNetUsers_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -218,6 +258,28 @@ namespace Persistence.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_ChannelId",
+                table: "Messages",
+                column: "ChannelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_SenderId",
+                table: "Messages",
+                column: "SenderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TypingNotifications_ChannelId",
+                table: "TypingNotifications",
+                column: "ChannelId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TypingNotifications_SenderId",
+                table: "TypingNotifications",
+                column: "SenderId",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -238,40 +300,19 @@ namespace Persistence.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Messages");
+
+            migrationBuilder.DropTable(
+                name: "TypingNotifications");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "Channels");
+
+            migrationBuilder.DropTable(
                 name: "AspNetUsers");
-
-            migrationBuilder.DeleteData(
-                table: "Channels",
-                keyColumn: "Id",
-                keyValue: new Guid("4c2b9717-6291-437c-a766-80449d844266"));
-
-            migrationBuilder.DeleteData(
-                table: "Channels",
-                keyColumn: "Id",
-                keyValue: new Guid("8cdd4a38-6b7a-4acf-b9e0-a5e1a66550ab"));
-
-            migrationBuilder.DeleteData(
-                table: "Channels",
-                keyColumn: "Id",
-                keyValue: new Guid("cfe36434-4780-4bcb-8c65-cc4207b4240b"));
-
-            migrationBuilder.InsertData(
-                table: "Channels",
-                columns: new[] { "Id", "Description", "Name" },
-                values: new object[] { new Guid("71e9cc37-a261-4493-91b3-4f6d1e3cc020"), "This channel is dedicated to DotNet Core", "DotNetCore" });
-
-            migrationBuilder.InsertData(
-                table: "Channels",
-                columns: new[] { "Id", "Description", "Name" },
-                values: new object[] { new Guid("a389a51d-d2a7-400e-97ac-e5b299aeba92"), "This channel is dedicated to Angular", "Angular" });
-
-            migrationBuilder.InsertData(
-                table: "Channels",
-                columns: new[] { "Id", "Description", "Name" },
-                values: new object[] { new Guid("550afbdf-08b6-4560-b2f0-4f56bffb9d65"), "This channel is dedicated to ReactJs", "ReactJs" });
         }
     }
 }

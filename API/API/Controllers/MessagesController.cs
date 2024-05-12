@@ -1,8 +1,10 @@
 ﻿using API.SignalR;
 using Application.Messages;
+using Application.TypingNotifications;
 using Application.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -29,6 +31,12 @@ namespace API.Controllers
 
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", response);
             return response.Result;
+        }
+
+        [HttpGet("typing/all-by-current-user")]
+        public async Task<ActionResult<List<TypingNotificationVM>>> GetAllTypingByUser()
+        {
+            return await _mediator.Send(new GetAllTypingNotificationByCurrentUser.Query());
         }
     }
 }

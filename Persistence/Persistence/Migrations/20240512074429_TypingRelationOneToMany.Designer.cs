@@ -9,8 +9,8 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240316203818_AddedIdentity")]
-    partial class AddedIdentity
+    [Migration("20240512074429_TypingRelationOneToMany")]
+    partial class TypingRelationOneToMany
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,6 +26,9 @@ namespace Persistence.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Avatar")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
@@ -35,6 +38,9 @@ namespace Persistence.Migrations
                         .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsOnline")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("LockoutEnabled")
@@ -88,35 +94,72 @@ namespace Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("ChannelType")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("PrivateChannelId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.ToTable("Channels");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("8cdd4a38-6b7a-4acf-b9e0-a5e1a66550ab"),
-                            Description = "This channel is dedicated to DotNet Core",
-                            Name = "DotNetCore"
-                        },
-                        new
-                        {
-                            Id = new Guid("cfe36434-4780-4bcb-8c65-cc4207b4240b"),
-                            Description = "This channel is dedicated to Angular",
-                            Name = "Angular"
-                        },
-                        new
-                        {
-                            Id = new Guid("4c2b9717-6291-437c-a766-80449d844266"),
-                            Description = "This channel is dedicated to ReactJs",
-                            Name = "ReactJs"
-                        });
+            modelBuilder.Entity("Domain.Message", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ChannelId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MessageType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SenderId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChannelId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("Domain.TypingNotification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ChannelId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChannelId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("TypingNotifications");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -245,6 +288,32 @@ namespace Persistence.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("Domain.Message", b =>
+                {
+                    b.HasOne("Domain.Channel", "Channel")
+                        .WithMany("Messages")
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.AppUser", "Sender")
+                        .WithMany("Messages")
+                        .HasForeignKey("SenderId");
+                });
+
+            modelBuilder.Entity("Domain.TypingNotification", b =>
+                {
+                    b.HasOne("Domain.Channel", "Channel")
+                        .WithMany("TypingNotifications")
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.AppUser", "Sender")
+                        .WithMany("TypingNotifications")
+                        .HasForeignKey("SenderId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

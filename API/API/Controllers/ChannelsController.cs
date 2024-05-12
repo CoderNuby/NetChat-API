@@ -37,5 +37,12 @@ namespace API.Controllers
         {
             return await _mediator.Send(new CreatePrivateChannelDetails.Command(channelId));
         }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ChannelVM>> Update(Guid id, [FromBody] ChannelUpdateVM channel)
+        {
+            channel.Id = id;
+            return await _mediator.Send(new UpdateChannel.Command(channel));
+        }
     }
 }
